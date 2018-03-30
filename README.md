@@ -1,0 +1,2 @@
+# rabbitmqtest
+testapp using rabbitmq
