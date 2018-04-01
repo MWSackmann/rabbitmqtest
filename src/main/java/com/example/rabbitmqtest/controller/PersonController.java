@@ -23,9 +23,6 @@ public class PersonController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Autowired
-    private Receiver receiver;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
     @RequestMapping(value = "/persons", method = RequestMethod.GET, produces = {"application/json"})
