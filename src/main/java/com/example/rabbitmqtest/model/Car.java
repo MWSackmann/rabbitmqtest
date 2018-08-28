@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Person {
-    private String firstName;
-    private String lastName;
+public class Car {
+    private String model;
+    private String licenceTemplate;
 }

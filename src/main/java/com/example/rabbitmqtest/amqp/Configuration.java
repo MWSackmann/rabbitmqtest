@@ -4,9 +4,6 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -16,37 +13,40 @@ import org.springframework.stereotype.Component;
 @Component
 public class Configuration {
 
-    public static final String topicExchangeName = "spring-boot-exchange";
+    public static final String topicExchangeNameReplication = "spring-boot-exchange-replication";
+    public static final String topicExchangeNameFulfillment = "spring-boot-exchange-fulfillment";
 
-    public static final String queueName = "spring-boot";
+    public static final String queueNameReplication = "order-s4-replication.order-update-event.version.1.queue";
+    public static final String queueNameFulfillment = "order-s4-replication.order-fulfillment-status-update-event.version.1.queue";
 
     @Bean
-    Queue queue() {
-        return new Queue(queueName, false);
+    Queue queueReplication() {
+        return new Queue(queueNameReplication, true);
     }
 
     @Bean
-    TopicExchange exchange() {
-        return new TopicExchange(topicExchangeName);
+    Queue queueFulfillment() {
+        return new Queue(queueNameFulfillment, true);
     }
 
     @Bean
-    Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("foo.bar.#");
+    TopicExchange exchangeReplication() {
+        return new TopicExchange(topicExchangeNameReplication);
     }
 
     @Bean
-    SimpleMessageListenerContainer container(ConnectionFactory connectionFactory,
-                                             MessageListenerAdapter listenerAdapter) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(queueName);
-        container.setMessageListener(listenerAdapter);
-        return container;
+    TopicExchange exchangeFulfillment() {
+        return new TopicExchange(topicExchangeNameFulfillment);
     }
 
     @Bean
-    MessageListenerAdapter listenerAdapter(Receiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveMessage");
+    Binding bindingFulFillment() {
+        return BindingBuilder.bind(queueFulfillment()).to(exchangeFulfillment()).with("foo.bar.#");
     }
+
+    @Bean
+    Binding bindingReplication() {
+        return BindingBuilder.bind(queueReplication()).to(exchangeReplication()).with("foo.bar.#");
+    }
+
 }
